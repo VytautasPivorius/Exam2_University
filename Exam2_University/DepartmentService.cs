@@ -11,27 +11,39 @@ namespace Exam2_University
         {
             _dbContext = dbContext;
         }
-        public void CreateDepartment(string id, string name)
+        public Department CreateDepartment()
         {
-            var department = new Department(id,name);
+            Console.Write("Iveskite departamento ID: ");
+            string inputId = Console.ReadLine().ToUpper();
+            Console.Write("Iveskite departamento pavadinima: ");
+            string inputName = Console.ReadLine();
 
-            _dbContext.Departments.Add(department);
-            _dbContext.SaveChanges();
+            Department department = new Department(inputId, inputName);
+            return department;
         }
-        public void AddLectures()
-        {
 
-        }
-        public void PrintStudents(Department department)
+        public void AddLecturesToDepartment(Department department)
         {
-            var students = department.Students;
-            Console.WriteLine("------------STUDENTAI------------");
-
-            foreach (var student in students)
+            while (true)
             {
-                Console.WriteLine($"{student.FirstName} {student.LastName} {student.Email} - {student.Department.Name}");
+                Console.WriteLine("Pasirinkite paskaita kuria norite prideti: ");
+                Console.WriteLine("Grizti - spauskite [Q]");
+
+                string inputLectureAdd = Console.ReadLine().ToUpper();
+                int id = 0;
+                if (inputLectureAdd == "Q")
+                {
+                    break;
+                }
+                else if (!int.TryParse(inputLectureAdd, out id))
+                {
+                    continue;
+                }
+                Lecture lecture = GetLectureById(id);
+                department.Lectures.Add(lecture);
             }
         }
+
         public void PrintDepartments()
         {
             var departments = _dbContext.Departments;
@@ -43,25 +55,18 @@ namespace Exam2_University
             }
         }
 
-        public void PrintLectures(List<Lecture> lectures)
-        {
-            Console.WriteLine("------------PASKAITOS------------");
-            int i = 1;
-            foreach (var lecture in lectures)
-            {
-                Console.WriteLine($"{i} - {lecture.Title}");
-                i++;
-            }
-        }
-        public void PrintDepartmentMenu()
-        {
-            Console.WriteLine("--------------MENIU--------------");
-            Console.WriteLine("1 - Paskaitos");
-            Console.WriteLine("2 - Studentai");
-        }
+
         public Department GetCurrentDepartment(string input)
         {
-            return _dbContext.Departments.Include(x=>x.Lectures).Include(x=>x.Students).Single(x => x.DepartmentId == input);
+            return _dbContext.Departments.Include(x=>x.Lectures).Include(x=>x.Students).SingleOrDefault(x => x.DepartmentId == input);
+        }
+        public Department GetDepartmentById(string departmentId)
+        {
+            return _dbContext.Departments.SingleOrDefault(x => x.DepartmentId == departmentId);
+        }
+        public Lecture GetLectureById(int id)
+        {
+            return _dbContext.Lectures.SingleOrDefault(x => x.LectureId == id);
         }
 
     }

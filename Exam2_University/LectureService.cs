@@ -1,4 +1,6 @@
-﻿namespace Exam2_University
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Exam2_University
 {
     public class LectureService
     {
@@ -8,13 +10,46 @@
         {
             _dbContext = dbContext;
         }
-        public void CreateLecture(string title,Department department)
+        public Lecture CreateLecture()
         {
-            Lecture lecture = new Lecture(title);
-            lecture.Departments.Add(department);
-            _dbContext.Lectures.Add(lecture);
-            _dbContext.SaveChanges();
+
+            Console.Write("Paskaitos pavadinimas: ");
+            string inputTitle = Console.ReadLine().ToUpper();
+
+            Lecture lecture = new Lecture(inputTitle);
+
+            return lecture;
         }
-        
+        public void AddDepartmentsToLecture(Lecture lecture)
+        {
+            while (true)
+            {
+                Console.WriteLine("Pasirinkite departamenta kuri norite prideti: ");
+                Console.WriteLine("Grizti - spauskite [Q]");
+
+                string departmentId = Console.ReadLine().ToUpper();
+                int id = 0;
+                if (departmentId == "Q")
+                {
+                    break;
+                }
+                var department = GetDepartmentById(departmentId);
+                lecture.Departments.Add(department);
+            }
+        }
+
+        public Department GetDepartmentById( string departmentId)
+        {
+            return _dbContext.Departments.SingleOrDefault(x => x.DepartmentId == departmentId);
+        }
+
+        public void PrintLectures(List<Lecture> lectures)
+        {
+            Console.WriteLine("------------PASKAITOS------------");
+            foreach (var lecture in lectures)
+            {
+                Console.WriteLine($"[{lecture.LectureId}] - {lecture.Title}");
+            }
+        }
     }
 }
