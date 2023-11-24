@@ -10,16 +10,22 @@ namespace Exam2_University
         {
             _dbContext = dbContext;
         }
+        
+        //Priimama naudotojo ivestis,
+        //sukuriama paskaita.
         public Lecture CreateLecture()
         {
 
             Console.Write("Paskaitos pavadinimas: ");
-            string inputTitle = Console.ReadLine().ToUpper();
+            string inputTitle = Console.ReadLine();
 
             Lecture lecture = new Lecture(inputTitle);
 
             return lecture;
         }
+
+        //Priimama naudoto ivestis,
+        //pridedamas departamentas i paskaita.
         public void AddDepartmentsToLecture(Lecture lecture)
         {
             while (true)
@@ -34,15 +40,27 @@ namespace Exam2_University
                     break;
                 }
                 var department = GetDepartmentById(departmentId);
-                lecture.Departments.Add(department);
+                if(department != null)
+                {
+                    lecture.Departments.Add(department);
+                }
+                
             }
         }
 
-        public Department GetDepartmentById( string departmentId)
+        //Gaunama paskaita is DB pagal ID.
+        public Lecture GetLectureById(int id)
         {
-            return _dbContext.Departments.SingleOrDefault(x => x.DepartmentId == departmentId);
+            return _dbContext.Lectures.FirstOrDefault(x => x.LectureId == id);
         }
 
+        //Gaunamas departamentas is DB pagal Departamento ID.
+        public Department GetDepartmentById( string departmentId)
+        {
+            return _dbContext.Departments.FirstOrDefault(x => x.DepartmentId == departmentId);
+        }
+
+        //Spausdinamos paskaitos.
         public void PrintLectures(List<Lecture> lectures)
         {
             Console.WriteLine("------------PASKAITOS------------");

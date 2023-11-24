@@ -16,6 +16,10 @@ namespace Exam2_University
             _dbContext = dbContext;
         }
 
+        //Priimama naudotojo ivestis,
+        //sukuriamas studentas,
+        //priskiramas departamentas studentui pagal nurodyta departamento ID,
+        //priskiriamos to departamento paskaitos studentui
         public Student CreateStudent()
         {
             Console.Write("Asmens kodas: ");
@@ -35,30 +39,40 @@ namespace Exam2_University
             
             Student student = new Student(inputId, inputFistName, inputLastName);
 
-
-
             Department department = GetDepartmentById(inputDepartmentId);
-
-            student.Department = department;
-            student.Lectures = department.Lectures;
-            student.Email = inputEmail;
+            if(department != null && student != null)
+            {
+                student.Department = department;
+                student.Lectures = department.Lectures;
+                student.Email = inputEmail;
+            }
+            
             return student;
         }
 
-        public Department GetDepartmentById(string departmentId)
+        //Gaunamas departamentas is DB pagal Departamento ID.
+        private Department GetDepartmentById(string departmentId)
         {
-            return _dbContext.Departments.Single(x => x.DepartmentId == departmentId);
+            return _dbContext.Departments.FirstOrDefault(x => x.DepartmentId == departmentId);
         }
+
+        //Gaunamas studentas is DB pagal Departamento ID.
         public Student GetStudentById(Department department, string studentId)
         {
-            return department.Students.Single(x => x.StudentId == studentId);
+            return department.Students.FirstOrDefault(x => x.StudentId == studentId);
         }
+
+        //Spausdinami studentai
         public void PrintStudents(List<Student> students)
         {
             Console.WriteLine("------------STUDENTAI------------");
             foreach (var student in students)
             {
-                Console.WriteLine($"{student.StudentId} {student.FirstName} {student.LastName} {student.Email} - {student.Department.Name}");
+                string akv = $"A.k:{student.StudentId} Vardas:{student.FirstName} {student.LastName} ";
+                string em = $"Email:{student.Email} ";
+                string dep = $"Departamentas:{student.Department.Name}";
+
+                Console.WriteLine($"{akv.PadRight(55)}{em.PadRight(40)}{dep.PadRight(30)}");
             }
         }
     }

@@ -6,11 +6,13 @@ namespace Exam2_University
     public class DepartmentService
     {
         private readonly UniversityContext _dbContext;
-
         public DepartmentService(UniversityContext dbContext)
         {
             _dbContext = dbContext;
         }
+
+        //Priimama naudotojo ivestis,
+        //sukuriamas departamentas.
         public Department CreateDepartment()
         {
             Console.Write("Iveskite departamento ID: ");
@@ -21,29 +23,9 @@ namespace Exam2_University
             Department department = new Department(inputId, inputName);
             return department;
         }
+        
 
-        public void AddLecturesToDepartment(Department department)
-        {
-            while (true)
-            {
-                Console.WriteLine("Pasirinkite paskaita kuria norite prideti: ");
-                Console.WriteLine("Grizti - spauskite [Q]");
-
-                string inputLectureAdd = Console.ReadLine().ToUpper();
-                int id = 0;
-                if (inputLectureAdd == "Q")
-                {
-                    break;
-                }
-                else if (!int.TryParse(inputLectureAdd, out id))
-                {
-                    continue;
-                }
-                Lecture lecture = GetLectureById(id);
-                department.Lectures.Add(lecture);
-            }
-        }
-
+        //Atspausdinami visi DB departamentai
         public void PrintDepartments()
         {
             var departments = _dbContext.Departments;
@@ -55,18 +37,22 @@ namespace Exam2_University
             }
         }
 
-
+        //Gaunamas departamentas, paskaitos ir studentai is DB pagal Departamento ID.
         public Department GetCurrentDepartment(string input)
         {
-            return _dbContext.Departments.Include(x=>x.Lectures).Include(x=>x.Students).SingleOrDefault(x => x.DepartmentId == input);
+            return _dbContext.Departments.Include(x=>x.Lectures).Include(x=>x.Students).FirstOrDefault(x => x.DepartmentId == input);
         }
+
+        //Gaunamas Departamentas is DB pagal ID
         public Department GetDepartmentById(string departmentId)
         {
-            return _dbContext.Departments.SingleOrDefault(x => x.DepartmentId == departmentId);
+            return _dbContext.Departments.FirstOrDefault(x => x.DepartmentId == departmentId);
         }
+        
+        //Gaunama paskaita is DB pagal ID
         public Lecture GetLectureById(int id)
         {
-            return _dbContext.Lectures.SingleOrDefault(x => x.LectureId == id);
+            return _dbContext.Lectures.FirstOrDefault(x => x.LectureId == id);
         }
 
     }

@@ -16,6 +16,7 @@ namespace Exam2_University
             DepartmentService departmentService = new DepartmentService(dbContext);
             LectureService lectureService = new LectureService(dbContext);
             StudentService studentService = new StudentService(dbContext);
+            GeneralService generalService = new GeneralService();
             while (true)
             {
 
@@ -27,6 +28,7 @@ namespace Exam2_University
                 Console.WriteLine("---------------------------------");
                 Console.Write("Ivestis: ");
                 string inputMainMenu = Console.ReadLine().ToUpper();
+
 
                 if (inputMainMenu == "1")
                 {
@@ -69,8 +71,18 @@ namespace Exam2_University
                             {
                                 lectureService.PrintLectures(dbContext.Lectures.ToList());
 
-                                departmentService.AddLecturesToDepartment(department);
-                                
+                                Console.WriteLine("Pasirinkite paskaita kuria norite prideti: ");
+                                Console.WriteLine("Grizti - spauskite [Q]");
+                                int inputUser = generalService.ValidateInputStringToInt();
+
+                                if (inputUser == -1)
+                                {
+                                    break;
+                                }
+
+                                var lecture = departmentService.GetLectureById(inputUser);
+                                department.Lectures.Add(lecture);
+
                             }
                             dbContext.SaveChanges();
                         }
@@ -81,6 +93,7 @@ namespace Exam2_University
                         {
                             continue;
                         }
+
                         Console.Clear();
                         Console.WriteLine($"--------------{curentDepartment.Name}--------------");
                         Console.WriteLine("1 - Paskaitos");
@@ -139,9 +152,9 @@ namespace Exam2_University
                                 {
                                     break;
                                 }
-                                Student student = studentService.GetStudentById(curentDepartment,inputStudent);
+                                Student currentStudent = studentService.GetStudentById(curentDepartment,inputStudent);
 
-                                if (student == null)
+                                if (currentStudent == null)
                                 {
                                     continue;
                                 }
@@ -149,9 +162,11 @@ namespace Exam2_University
                                 while (true)
                                 {
                                     Console.Clear();
-                                    Console.WriteLine($"---------{student.FirstName} {student.LastName}---------");
+                                    Console.WriteLine($"---------{currentStudent.FirstName} {currentStudent.LastName}---------");
                                     Console.WriteLine("1 - Rodyti paskaitas");
                                     Console.WriteLine("2 - Pakeisti departamenta");
+                                    Console.WriteLine("3 - Prideti paskaitas");
+                                    Console.WriteLine("*Grizti - spauskite [Q]");
                                     Console.WriteLine("---------------------------------");
                                     Console.Write("Ivestis: ");
                                     inputStudent = Console.ReadLine().ToUpper();
@@ -164,7 +179,7 @@ namespace Exam2_University
                                     if (inputStudent == "1")
                                     {
                                         Console.Clear();
-                                        lectureService.PrintLectures(student.Lectures);
+                                        lectureService.PrintLectures(currentStudent.Lectures);
                                         Console.ReadLine();
                                     }
                                     else if (inputStudent == "2")
@@ -178,9 +193,36 @@ namespace Exam2_University
 
                                         if (newDepartment != null)
                                         {
-                                            student.Department = newDepartment;
-                                            student.Lectures = newDepartment.Lectures;
+                                            currentStudent.Department = newDepartment;
+                                            currentStudent.Lectures = newDepartment.Lectures;
                                         }
+                                    }
+                                    else if(inputStudent == "3")
+                                    {
+                                        while (true)
+                                        {
+                                            Console.Clear();
+                                            Console.WriteLine($"--------------{curentDepartment.Name}--------------");
+                                            lectureService.PrintLectures(currentStudent.Lectures);
+                                            Console.WriteLine($"--------------ALL--------------");
+                                            lectureService.PrintLectures(dbContext.Lectures.ToList());
+
+                                            Console.WriteLine("*Iveskite paskaitos ID:");
+                                            Console.WriteLine("*Grizti - spauskite [Q]");
+                                            
+                                            int inputUser = generalService.ValidateInputStringToInt();
+
+                                            if(inputUser == -1)
+                                            {
+                                                break;
+                                            }
+
+                                            var lecture = lectureService.GetLectureById(inputUser);
+
+                                            currentStudent.Lectures.Add(lecture);
+                                            dbContext.SaveChanges();
+                                        }
+                                        
                                     }
                                     else
                                     {
@@ -192,9 +234,6 @@ namespace Exam2_University
                         }
                     }
                 }
-
-
-
 
 
                 else if(inputMainMenu == "2")
@@ -235,6 +274,7 @@ namespace Exam2_University
                    
                 }
 
+
                 else if(inputMainMenu == "3")
                 {
                     //INFORMACIJA:
@@ -259,10 +299,12 @@ namespace Exam2_University
                         {
                             Console.Clear();
                             var lecture = lectureService.CreateLecture();
+                            dbContext.Lectures.Add(lecture);
 
                             Console.WriteLine("*Jeigu norite priskirti departamentus - spauskite [A]");
                             Console.Write("Ivestis: ");
                             string inputDepartmentAdd = Console.ReadLine().ToUpper();
+                            dbContext.SaveChanges();
 
                             if (inputDepartmentAdd == "A")
                             {
@@ -272,10 +314,13 @@ namespace Exam2_University
 
                                 dbContext.SaveChanges();
                             }
+                            
                         }
                     }
                     
                 }
+
+
                 else
                 {
                     continue;
